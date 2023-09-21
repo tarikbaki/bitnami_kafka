@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-ui
+  labels:
+    app: kafka-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka-ui
+  template:
+    metadata:
+      labels:
+        app: kafka-ui
+    spec:
+      containers:
+      - name: kafka-ui
+        image: docker.io/provectuslabs/kafka-ui
+        env:
+        - name: DYNAMIC_CONFIG_ENABLED
+          value: "true"
+        - name: AUTH_TYPE
+          value: "LOGIN_FORM"
+        - name: SPRING_SECURITY_USER_NAME
+          value: admin
+        - name: SPRING_SECURITY_USER_PASSWORD
+          value: kafkaui12345*
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - mountPath: /etc/kafkaui/dynamic_config.yaml
+          name: kafkaui-config
+          subPath: dynamic_config.yaml
+      volumes:
+      - name: kafkaui-config
+        configMap:
+          name: kafkaui-config
